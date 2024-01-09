@@ -1,3 +1,14 @@
+
+use std::fs::File;
+use std::io::Read;
+use egui::{widgets::TextEdit};
+
+// use grep::regex::RegexMatcher;
+// use grep::searcher::sinks::UTF8;
+// use grep::searcher::Searcher;
+//use std::error::Error;
+
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -67,24 +78,27 @@ impl eframe::App for TemplateApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
-            ui.heading("eframe template");
+            ui.heading("/dev/random");
 
-            ui.horizontal(|ui| {
-                ui.label("Write something: ");
-                ui.text_edit_singleline(&mut self.label);
-            });
+            // ui.horizontal(|ui| {
+            //     ui.label("Write something: ");
+            //     ui.text_edit_singleline(&mut self.label);
+            // });
 
-            ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                self.value += 1.0;
-            }
+            // ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
+            // if ui.button("Increment").clicked() {
+            //     self.value += 1.0;
+            // }
 
-            ui.separator();
+            // ui.separator();
 
-            ui.add(egui::github_link_file!(
-                "https://github.com/emilk/eframe_template/blob/master/",
-                "Source code."
-            ));
+            let mut file = File::open("/dev/random").expect("Unable to open /dev/random");
+            let mut buffer = [0; 1024];
+            file.read(&mut buffer).expect("Unable to read /dev/random");
+
+            let mut random_hex = buffer.iter().map(|b| format!("{:02x}", b)).collect::<String>();
+
+            TextEdit::multiline(&mut random_hex).show(ui);
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 powered_by_egui_and_eframe(ui);
